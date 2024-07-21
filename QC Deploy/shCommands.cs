@@ -43,5 +43,13 @@
             string rmCommand = "rm /opt/tomcat/webapps/bk/" + appService + ".war";
             return rmCommand;
         }
+
+        private string cleanLogs()
+        {
+            string catCommand = "cat /dev/null > /opt/tomcat/logs/catalina.out";
+            return catCommand;
+        }
+
+        
     }
 }

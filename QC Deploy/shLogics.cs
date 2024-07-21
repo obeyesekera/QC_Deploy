@@ -231,6 +231,8 @@ namespace QC_Deploy
                 string rmCommand = cleanWebAppsRM(webModule.ToString());
                 executeCommand(rmCommand, "W");
             }
+            string catCommand = cleanLogs();
+            executeCommand(catCommand, "W");
         }
 
         private void cleanServices()
@@ -240,6 +242,9 @@ namespace QC_Deploy
                 string rmCommand = cleanServicesRM(appService.ToString());
                 executeCommand(rmCommand, "A");
             }
+
+            string catCommand = cleanLogs();
+            executeCommand(catCommand, "A");
         }
 
 
