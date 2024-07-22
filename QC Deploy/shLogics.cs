@@ -7,14 +7,15 @@ namespace QC_Deploy
 {
     partial class mainForm
     {
-        
+
 
         private Boolean isTrigger;
+        private Boolean isConnected;
         private string[,] serverCon;
-        
+
         Server appServer;
         Server webServer;
-        
+
 
         private void pageLoad()
         {
@@ -26,6 +27,7 @@ namespace QC_Deploy
             cmbServers.DropDownStyle = ComboBoxStyle.DropDownList;
 
             isTrigger = false;
+            isConnected = false;
 
             radWebSrv.Checked = true;
 
@@ -48,7 +50,7 @@ namespace QC_Deploy
             btnConnect.Focus();
             btnConnect.ForeColor = Color.Red;
 
-            setTooltip();
+            setTooltip("Connect");
         }
 
         private void updateServerNames()
@@ -90,12 +92,37 @@ namespace QC_Deploy
             cmbServers.SelectedIndex = 0;
         }
 
-        private void setTooltip()
+        private void setTooltip(string btnConTT)
         {
-            toolTipCtrl.SetToolTip(btnConnect, "Connect");
+            toolTipCtrl.SetToolTip(btnConnect, btnConTT);
             toolTipCtrl.SetToolTip(btnBackup, "Backup");
             toolTipCtrl.SetToolTip(btnDeploy, "Build");
             toolTipCtrl.SetToolTip(btnClean, "Clean");
+        }
+
+
+        private void setConnect()
+        {
+            btnConnect.Text = "Ð";
+            btnConnect.ForeColor = Color.Red;
+            setTooltip("Connect");
+            cmbServers.Enabled = true;
+            radWebSrv.Enabled = true;
+            radAppSrv.Enabled = true;
+            webappsListBox.Enabled = true;
+            servicesListBox.Enabled = true;
+        }
+
+        private void setDisconnect()
+        {
+            btnConnect.Text = "Ï";
+            btnConnect.ForeColor = Color.Green;
+            setTooltip("Disconnect");
+            cmbServers.Enabled = false;
+            radWebSrv.Enabled = false;
+            radAppSrv.Enabled = false;
+            webappsListBox.Enabled = false;
+            servicesListBox.Enabled = false;
         }
 
         private void connectServer()
@@ -115,7 +142,13 @@ namespace QC_Deploy
                         if (connectionResult == "Connected to : " + webServer.getIP())
                         {
                             btnBackup.Enabled = true;
+                            isConnected = true;
                         }
+                        else
+                        {
+                            setConnect();
+                        }
+
                     }
                     else
                     {
@@ -123,6 +156,7 @@ namespace QC_Deploy
                         btnBackup.Enabled = true;
                     }
 
+                    btnConnect.Enabled = true;
                     sshTextBoxPrint(connectionResult, "R");
                 }
 
@@ -140,7 +174,13 @@ namespace QC_Deploy
                         if (connectionResult == "Connected to : " + appServer.getIP())
                         {
                             btnBackup.Enabled = true;
+                            isConnected = true;
                         }
+                        else
+                        {
+                            setConnect();
+                        }
+
                     }
                     else
                     {
@@ -148,9 +188,10 @@ namespace QC_Deploy
                         btnBackup.Enabled = true;
                     }
 
+                    btnConnect.Enabled = true;
                     sshTextBoxPrint(connectionResult, "R");
 
-                    
+
 
                 }
 
@@ -171,6 +212,7 @@ namespace QC_Deploy
                 {
                     sshTextBoxPrint(appServer.disconnectServer(), "R");
                 }
+                isConnected = false;
             }
             else
             {

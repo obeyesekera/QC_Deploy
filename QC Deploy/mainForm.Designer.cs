@@ -190,7 +190,10 @@ namespace QC_Deploy
             this.Controls.Add(this.btnConnect);
             this.Controls.Add(this.sshTextBox);
             this.Controls.Add(this.btnBackup);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "mainForm";
             this.Text = "QC Deploy v1.0";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.mainForm_FormClosing);

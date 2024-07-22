@@ -13,7 +13,7 @@ namespace QC_Deploy
 
         private string disconnectDialogTitle = "Confirm Disconnect";
         private string disconnectDialogMessage = "Do you want to DISCONNECT from Server?";
-        
+
         private string backupDialogTitle = "Confirm Backup Files";
         private string backupDialogMessage = "Do you want to backup selected files?";
 
@@ -23,5 +23,7 @@ namespace QC_Deploy
         private string cleanDialogTitle = "Confirm Delete Files";
         private string cleanpDialogMessage = "Do you want to clean backup files?";
 
+        private string closeDialogTitle = "App closing";
+        private string closeDialogMessage = "Do you want close this app";
     }
 }

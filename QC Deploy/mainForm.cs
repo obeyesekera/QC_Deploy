@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Drawing;
 using System.Windows.Forms;
 
 namespace QC_Deploy
@@ -11,7 +10,7 @@ namespace QC_Deploy
             InitializeComponent();
         }
 
-        
+
         private void mainForm_Load(object sender, EventArgs e)
         {
             pageLoad();
@@ -22,14 +21,8 @@ namespace QC_Deploy
         {
             if (btnConnect.Text == "Ð")
             {
-                btnConnect.Text = "Ï";
-                btnConnect.ForeColor = Color.Green;
-                toolTipCtrl.SetToolTip(btnConnect, "Disconnect");
-                cmbServers.Enabled = false;
-                radWebSrv.Enabled = false;
-                radAppSrv.Enabled = false;
-                webappsListBox.Enabled = false;
-                servicesListBox.Enabled = false;
+                btnConnect.Enabled = false;
+                setDisconnect();
                 connectServer();
             }
             else
@@ -41,14 +34,8 @@ namespace QC_Deploy
                     btnClean.Enabled = false;
                     btnDeploy.Enabled = false;
                     disconnectServer();
-                    btnConnect.Text = "Ð";
-                    btnConnect.ForeColor = Color.Red;
-                    toolTipCtrl.SetToolTip(btnConnect, "Connect");
-                    cmbServers.Enabled = true;
-                    radWebSrv.Enabled = true;
-                    radAppSrv.Enabled = true;
-                    webappsListBox.Enabled = true;
-                    servicesListBox.Enabled = true;
+                    setConnect();
+                    btnConnect.Enabled = true;
                 }
             }
         }
@@ -216,11 +203,22 @@ namespace QC_Deploy
             }
         }
 
-         
+
 
         private void mainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-
+            if (isConnected)
+            {
+                DialogResult dialogResult = MessageBox.Show(closeDialogMessage, closeDialogTitle, MessageBoxButtons.YesNo);
+                if (dialogResult == DialogResult.Yes)
+                {
+                    disconnectServer();
+                }
+                else if (dialogResult == DialogResult.No)
+                {
+                    e.Cancel = true;
+                }
+            }
         }
     }
 }
