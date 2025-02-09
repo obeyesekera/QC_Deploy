@@ -10,41 +10,36 @@ namespace QC_Deploy
             InitializeComponent();
         }
 
-
         private void mainForm_Load(object sender, EventArgs e)
         {
             pageLoad();
         }
 
-
         private void btnConnect_Click(object sender, EventArgs e)
         {
-            if (btnConnect.Text == "Ð")
+            if (btnConnect.Text == "Ð") // Connect to server
             {
-                btnConnect.Enabled = false;
-                setDisconnect();
+                setqStatus("CONNECTING");
                 connectServer();
             }
-            else
+            else // Disconnect from server
             {
+                setqStatus("DISCONNECTING");
                 DialogResult dialogResult = MessageBox.Show(disconnectDialogMessage, disconnectDialogTitle, MessageBoxButtons.YesNo);
                 if (dialogResult == DialogResult.Yes)
                 {
-                    btnBackup.Enabled = false;
-                    btnClean.Enabled = false;
-                    btnDeploy.Enabled = false;
                     disconnectServer();
-                    setConnect();
-                    btnConnect.Enabled = true;
+                }
+                else if (dialogResult == DialogResult.No)
+                {
+                    setqStatus();
                 }
             }
         }
 
-
         private void btnBackup_Click(object sender, EventArgs e)
         {
-            btnBackup.Enabled = false;
-            btnConnect.Enabled = false;
+            setqStatus("BACKUP START");
 
             DialogResult dialogResult = MessageBox.Show(backupDialogMessage, backupDialogTitle, MessageBoxButtons.YesNo);
             if (dialogResult == DialogResult.Yes)
@@ -57,22 +52,44 @@ namespace QC_Deploy
                 {
                     backupServices();
                 }
-
-                btnDeploy.Enabled = true;
+                setqStatus("BACKUP DONE");
+                isBackup = true;
             }
             else if (dialogResult == DialogResult.No)
             {
-                btnBackup.Enabled = true;
+                setqStatus();
             }
-
-            btnConnect.Enabled = true;
         }
 
+        private void btnTouch_Click(object sender, EventArgs e)
+        {
+            setqStatus("TOUCHING");
+
+            DialogResult dialogResult = MessageBox.Show(touchDialogMessage, touchDialogTitle, MessageBoxButtons.YesNo);
+            if (dialogResult == DialogResult.Yes)
+            {
+                if (radWebSrv.Checked)
+                {
+                    touchWebApps();
+                }
+                else
+                {
+                    touchServices();
+                }
+                setqStatus("TOUCHED");
+                delBackup = true;
+                isBackup=false;
+                setBtnCleanFiles();
+            }
+            else if (dialogResult == DialogResult.No)
+            {
+                setqStatus();
+            }
+        }
 
         private void btnDeploy_Click(object sender, EventArgs e)
         {
-            btnDeploy.Enabled = false;
-            btnConnect.Enabled = false;
+            setqStatus("DEPLOYING");
 
             DialogResult dialogResult = MessageBox.Show(deployDialogMessage, deployDialogTitle, MessageBoxButtons.YesNo);
             if (dialogResult == DialogResult.Yes)
@@ -85,24 +102,33 @@ namespace QC_Deploy
                 {
                     deployServices();
                 }
-
-                btnClean.Enabled = true;
+                setqStatus("DEPLOYED");
+                delBackup = true;
+                isBackup = false;
+                setBtnCleanFiles();
             }
             else if (dialogResult == DialogResult.No)
             {
-                btnDeploy.Enabled = true;
+                setqStatus();
             }
-
-            btnConnect.Enabled = true;
         }
-
 
         private void btnClean_Click(object sender, EventArgs e)
         {
-            btnClean.Enabled = false;
-            btnConnect.Enabled = false;
+            setqStatus("CLEANING");
 
-            DialogResult dialogResult = MessageBox.Show(cleanpDialogMessage, cleanDialogTitle, MessageBoxButtons.YesNo);
+            string msg;
+
+            if (delBackup)
+            {
+                msg = cleanFileDialogMessage;
+            }
+            else
+            {
+                msg = cleanLogDialogMessage;
+            }
+
+            DialogResult dialogResult = MessageBox.Show(msg, cleanDialogTitle, MessageBoxButtons.YesNo);
             if (dialogResult == DialogResult.Yes)
             {
                 if (radWebSrv.Checked)
@@ -113,18 +139,12 @@ namespace QC_Deploy
                 {
                     cleanServices();
                 }
-
             }
             else if (dialogResult == DialogResult.No)
             {
-                btnClean.Enabled = true;
+                setqStatus();
             }
-
-            btnConnect.Enabled = true;
         }
-
-
-
 
         private void radWebSrv_CheckedChanged(object sender, EventArgs e)
         {
@@ -132,7 +152,6 @@ namespace QC_Deploy
             {
                 btnConnect.Enabled = webServer.getRequired();
             }
-
             sshTextBoxClear();
         }
 
@@ -142,7 +161,6 @@ namespace QC_Deploy
             {
                 btnConnect.Enabled = appServer.getRequired();
             }
-
             sshTextBoxClear();
         }
 
@@ -155,7 +173,6 @@ namespace QC_Deploy
 
                 updateServerNames();
                 sshTextBoxClear();
-
             }
         }
 
@@ -172,12 +189,10 @@ namespace QC_Deploy
                     webServer.setWebRequired(false);
                 }
 
-
                 if (radWebSrv.Checked)
                 {
                     btnConnect.Enabled = webServer.getRequired();
                 }
-
             }
         }
 
@@ -194,22 +209,35 @@ namespace QC_Deploy
                     appServer.setServiceRequired(false);
                 }
 
-
                 if (radAppSrv.Checked)
                 {
                     btnConnect.Enabled = appServer.getRequired();
                 }
-
             }
         }
-
-
 
         private void mainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (isConnected)
             {
-                DialogResult dialogResult = MessageBox.Show(closeDialogMessage, closeDialogTitle, MessageBoxButtons.YesNo);
+                string msg;
+
+                if (btnConnect.Enabled)
+                {
+                    msg = closeDialogConfirmMessage;
+                }
+                else
+                {
+                    if (btnDeploy.Enabled) {
+                        msg = closeDialogErrorMessage; 
+                    }
+                    else
+                    {
+                        msg = closeDialogWarningMessage; 
+                    }
+                }
+
+                DialogResult dialogResult = MessageBox.Show(msg, closeDialogTitle, MessageBoxButtons.YesNo);
                 if (dialogResult == DialogResult.Yes)
                 {
                     disconnectServer();
@@ -219,6 +247,11 @@ namespace QC_Deploy
                     e.Cancel = true;
                 }
             }
+        }
+
+        private void qStatus_TextChanged(object sender, EventArgs e)
+        {
+            setBtnStatus();
         }
     }
 }

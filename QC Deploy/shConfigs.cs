@@ -20,10 +20,16 @@ namespace QC_Deploy
         private string deployDialogTitle = "Confirm Build Status";
         private string deployDialogMessage = "is Build completed on Release Manager?";
 
-        private string cleanDialogTitle = "Confirm Delete Files";
-        private string cleanpDialogMessage = "Do you want to clean backup files?";
+        private string touchDialogTitle = "Confirm Touch Files";
+        private string touchDialogMessage = "Do you want to touch backup files?";
+
+        private string cleanDialogTitle = "Confirm Clean Files";
+        private string cleanFileDialogMessage = "Do you want to clean backup files and logs?";
+        private string cleanLogDialogMessage = "Do you want to clean log files?";
 
         private string closeDialogTitle = "App closing";
-        private string closeDialogMessage = "Do you want close this app";
+        private string closeDialogConfirmMessage = "Server Connected. Do you want to exit?";
+        private string closeDialogWarningMessage = "Backup Files not cleaned. Do you want to exit?";
+        private string closeDialogErrorMessage = "Selected files not deployed. Do you want to exit?";
     }
 }

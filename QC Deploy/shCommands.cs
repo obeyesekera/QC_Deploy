@@ -31,6 +31,30 @@
             string scpCommand = appService + " build COMPLETE";
             return scpCommand;
         }
+                
+        private string touchWebAppsRM(string webModule)
+        {
+            string mvCommand = "rm -rf /opt/tomcat/webapps/" + webModule;
+            return mvCommand;
+        }
+
+        private string touchServicesRM(string appService)
+        {
+            string mvCommand = "rm -rf /opt/tomcat/webapps/" + appService + ".war";
+            return mvCommand;
+        }
+
+        private string touchWebAppsMV(string webModule)
+        {
+            string mvCommand = "mv /opt/tomcat/webapps/bk_" + webModule + " /opt/tomcat/webapps/" + webModule;
+            return mvCommand;
+        }
+
+        private string touchServicesMV(string appService)
+        {
+            string mvCommand = "mv /opt/tomcat/webapps/bk/" + appService + ".war /opt/tomcat/webapps/" + appService + ".war";
+            return mvCommand;
+        }
 
         private string cleanWebAppsRM(string webModule)
         {

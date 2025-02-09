@@ -7,27 +7,32 @@ namespace QC_Deploy
 {
     partial class mainForm
     {
-
-
         private Boolean isTrigger;
         private Boolean isConnected;
         private string[,] serverCon;
+        private Boolean delBackup;
+        private Boolean isBackup;
 
         Server appServer;
         Server webServer;
 
+        private string prevStatus;
 
         private void pageLoad()
         {
+            //set version info
+            Version version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+            this.Text = "QC Deploy v" + version;
+
+            setqStatus("DISCONNECTED");
             btnConnect.Enabled = false;
-            btnBackup.Enabled = false;
-            btnDeploy.Enabled = false;
-            btnClean.Enabled = false;
 
             cmbServers.DropDownStyle = ComboBoxStyle.DropDownList;
 
             isTrigger = false;
             isConnected = false;
+            delBackup = false;
+            isBackup = false;
 
             radWebSrv.Checked = true;
 
@@ -50,7 +55,24 @@ namespace QC_Deploy
             btnConnect.Focus();
             btnConnect.ForeColor = Color.Red;
 
-            setTooltip("Connect");
+            setBtnCleanLogs();
+            setBtnConnect();
+        }
+
+        private void setqStatus(string newStatus)
+        {
+            prevStatus = qStatus.Text;
+            qStatus.Text = newStatus;
+        }
+
+        private void setqStatus()
+        {
+            qStatus.Text = prevStatus;
+        }
+
+        private string getqStatus()
+        {
+            return qStatus.Text;
         }
 
         private void updateServerNames()
@@ -92,37 +114,57 @@ namespace QC_Deploy
             cmbServers.SelectedIndex = 0;
         }
 
-        private void setTooltip(string btnConTT)
+        private void setTooltip(string btnConnectTT, string btnCleanTT)
         {
-            toolTipCtrl.SetToolTip(btnConnect, btnConTT);
+            string btnConnectPrevTT = toolTipCtrl.GetToolTip(btnConnect);
+            string btnCleanPrevTT = toolTipCtrl.GetToolTip(btnClean);
+
+            if (btnConnectTT.Length > 0)
+            {
+                toolTipCtrl.SetToolTip(btnConnect, btnConnectTT);
+            }
+            else
+            {
+                toolTipCtrl.SetToolTip(btnConnect, btnConnectPrevTT);
+            }
             toolTipCtrl.SetToolTip(btnBackup, "Backup");
             toolTipCtrl.SetToolTip(btnDeploy, "Build");
-            toolTipCtrl.SetToolTip(btnClean, "Clean");
+            toolTipCtrl.SetToolTip(btnTouch, "Touch");
+            if (btnCleanTT.Length > 0)
+            {
+                toolTipCtrl.SetToolTip(btnClean, btnCleanTT);
+            }
+            else
+            {
+                toolTipCtrl.SetToolTip(btnClean, btnCleanPrevTT);
+            }
         }
 
 
-        private void setConnect()
+        private void setBtnConnect()
         {
             btnConnect.Text = "Ð";
             btnConnect.ForeColor = Color.Red;
-            setTooltip("Connect");
-            cmbServers.Enabled = true;
-            radWebSrv.Enabled = true;
-            radAppSrv.Enabled = true;
-            webappsListBox.Enabled = true;
-            servicesListBox.Enabled = true;
+            setTooltip("Connect", "");
         }
 
-        private void setDisconnect()
+        private void setBtnDisconnect()
         {
             btnConnect.Text = "Ï";
             btnConnect.ForeColor = Color.Green;
-            setTooltip("Disconnect");
-            cmbServers.Enabled = false;
-            radWebSrv.Enabled = false;
-            radAppSrv.Enabled = false;
-            webappsListBox.Enabled = false;
-            servicesListBox.Enabled = false;
+            setTooltip("Disconnect", "");
+        }
+
+        private void setBtnCleanFiles()
+        {
+            btnClean.ForeColor = Color.Red;
+            setTooltip("", "Clean Backups");
+        }
+
+        private void setBtnCleanLogs()
+        {
+            btnClean.ForeColor = Color.Blue;
+            setTooltip("", "Clen Logs");
         }
 
         private void connectServer()
@@ -141,25 +183,34 @@ namespace QC_Deploy
 
                         if (connectionResult == "Connected to : " + webServer.getIP())
                         {
-                            btnBackup.Enabled = true;
                             isConnected = true;
+                            setBtnDisconnect();
+                            setqStatus("CONNECTED");
                         }
                         else
                         {
-                            setConnect();
+                            setBtnConnect();
+                            setqStatus("DISCONNECTED");
                         }
-
                     }
                     else
                     {
                         connectionResult = "Connected to : DUMMY SERVER";
-                        btnBackup.Enabled = true;
-                    }
 
-                    btnConnect.Enabled = true;
+                        if (getqStatus() == "CONNECTING")
+                        {
+                            isConnected = true;
+                            setBtnDisconnect();
+                            setqStatus("CONNECTED");
+                        }
+                        else
+                        {
+                            setBtnConnect();
+                            setqStatus("DISCONNECTED");
+                        }
+                    }
                     sshTextBoxPrint(connectionResult, "R");
                 }
-
             }
             else
             {
@@ -173,28 +224,34 @@ namespace QC_Deploy
 
                         if (connectionResult == "Connected to : " + appServer.getIP())
                         {
-                            btnBackup.Enabled = true;
                             isConnected = true;
+                            setBtnDisconnect();
+                            setqStatus("CONNECTED");
                         }
                         else
                         {
-                            setConnect();
+                            setBtnConnect();
+                            setqStatus("DISCONNECTED");
                         }
-
                     }
                     else
                     {
                         connectionResult = "Connected to : DUMMY SERVER";
-                        btnBackup.Enabled = true;
+
+                        if (getqStatus() == "CONNECTING")
+                        {
+                            isConnected = true;
+                            setBtnDisconnect();
+                            setqStatus("CONNECTED");
+                        }
+                        else
+                        {
+                            setBtnConnect();
+                            setqStatus("DISCONNECTED");
+                        }
                     }
-
-                    btnConnect.Enabled = true;
                     sshTextBoxPrint(connectionResult, "R");
-
-
-
                 }
-
             }
         }
 
@@ -212,16 +269,18 @@ namespace QC_Deploy
                 {
                     sshTextBoxPrint(appServer.disconnectServer(), "R");
                 }
-                isConnected = false;
+                setBtnConnect();
+                setqStatus("DISCONNECTED");
             }
             else
             {
                 connectionResult = "Disconnected from : DUMMY SERVER";
                 sshTextBoxPrint(connectionResult, "R");
+                setBtnConnect();
+                setqStatus("DISCONNECTED");
             }
-
+            isConnected = false;
         }
-
 
         private void backupWebApps()
         {
@@ -231,7 +290,6 @@ namespace QC_Deploy
                 executeCommand(mvCommand, "W");
             }
         }
-
 
         private void backupServices()
         {
@@ -245,7 +303,6 @@ namespace QC_Deploy
             }
         }
 
-
         private void deployWebApps()
         {
             foreach (var webModule in webappsListBox.CheckedItems)
@@ -254,7 +311,6 @@ namespace QC_Deploy
                 sshTextBoxPrint(scpCommand, "D");
             }
         }
-
 
         private void deployServices()
         {
@@ -265,30 +321,78 @@ namespace QC_Deploy
             }
         }
 
-
-        private void cleanWebApps()
+        private void touchWebApps()
         {
             foreach (var webModule in webappsListBox.CheckedItems)
             {
-                string rmCommand = cleanWebAppsRM(webModule.ToString());
-                executeCommand(rmCommand, "W");
+                string touchRMCommand = touchWebAppsRM(webModule.ToString());
+                executeCommand(touchRMCommand, "W");
+                string touchMVCommand = touchWebAppsMV(webModule.ToString());
+                executeCommand(touchMVCommand, "W");
+            }
+        }
+
+        private void touchServices()
+        {
+            foreach (var appService in servicesListBox.CheckedItems)
+            {
+                string touchRMCommand = touchServicesRM(appService.ToString());
+                executeCommand(touchRMCommand, "A");
+                string touchMVCommand = touchServicesMV(appService.ToString());
+                executeCommand(touchMVCommand, "A");
+            }
+        }
+
+        private void cleanWebApps()
+        {
+            if (delBackup)
+            {
+                foreach (var webModule in webappsListBox.CheckedItems)
+                {
+                    string rmCommand = cleanWebAppsRM(webModule.ToString());
+                    executeCommand(rmCommand, "W");
+                }
+                setqStatus("CLEANED");
+                setBtnCleanLogs();
             }
             string catCommand = cleanLogs();
             executeCommand(catCommand, "W");
+
+            if (isBackup)
+            {
+                setqStatus("BACKUP DONE");
+            }
+            else
+            {
+                setqStatus("CLEANED");
+                delBackup = false;
+            }
         }
 
         private void cleanServices()
         {
-            foreach (var appService in servicesListBox.CheckedItems)
+            if (delBackup)
             {
-                string rmCommand = cleanServicesRM(appService.ToString());
-                executeCommand(rmCommand, "A");
+                foreach (var appService in servicesListBox.CheckedItems)
+                {
+                    string rmCommand = cleanServicesRM(appService.ToString());
+                    executeCommand(rmCommand, "A");
+                }
+                setqStatus("CLEANED");
+                setBtnCleanLogs();
             }
-
             string catCommand = cleanLogs();
             executeCommand(catCommand, "A");
-        }
 
+            if (isBackup)
+            {
+                setqStatus("BACKUP DONE");
+            }
+            else {
+                setqStatus("CLEANED");
+                delBackup = false;
+            }
+        }
 
         private void executeCommand(string newCommand, string srvType)
         {
@@ -329,5 +433,74 @@ namespace QC_Deploy
         {
             sshTextBox.Clear();
         }
+
+        private void setBtnStatus()
+        {
+            switch(getqStatus())
+            {
+                case "DISCONNECTED":
+                    btnConnect.Enabled = true;
+                    btnBackup.Enabled = false;
+                    btnDeploy.Enabled = false;
+                    btnTouch.Enabled = false;
+                    btnClean.Enabled = false;
+                    setUIComp(true);
+                    break;
+                case "CONNECTED":
+                    btnConnect.Enabled = true;
+                    btnBackup.Enabled = true;
+                    btnDeploy.Enabled = false;
+                    btnTouch.Enabled = false;
+                    btnClean.Enabled = true;
+                    break;
+                case "BACKUP DONE":
+                    btnConnect.Enabled = false;
+                    btnBackup.Enabled = false;
+                    btnDeploy.Enabled = true;
+                    btnTouch.Enabled = true;
+                    btnClean.Enabled = true;
+                    break;
+                case "DEPLOYED":
+                    btnConnect.Enabled = false;
+                    btnBackup.Enabled = false;
+                    btnDeploy.Enabled = false;
+                    btnTouch.Enabled = false;
+                    btnClean.Enabled = true;
+                    break;
+                case "TOUCHED":
+                    btnConnect.Enabled = false;
+                    btnBackup.Enabled = false;
+                    btnDeploy.Enabled = false;
+                    btnTouch.Enabled = false;
+                    btnClean.Enabled = true;
+                    break;
+                case "CLEANED":
+                    btnConnect.Enabled = true;
+                    btnBackup.Enabled = true;
+                    btnDeploy.Enabled = false;
+                    btnTouch.Enabled = false;
+                    btnClean.Enabled = true;
+                    break;
+                default:
+                    btnConnect.Enabled = false;
+                    btnBackup.Enabled = false;
+                    btnDeploy.Enabled = false;
+                    btnTouch.Enabled = false;
+                    btnClean.Enabled = false;
+                    setUIComp(false);
+                    break;
+            }
+        }
+
+        private void setUIComp(bool sts)
+        {
+            cmbServers.Enabled = sts;
+            radWebSrv.Enabled = sts;
+            radAppSrv.Enabled = sts;
+            webappsListBox.Enabled = sts;
+            servicesListBox.Enabled = sts;
+        }
+
+
     }
 }
