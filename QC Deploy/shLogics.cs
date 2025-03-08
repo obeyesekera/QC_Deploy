@@ -50,6 +50,9 @@ namespace QC_Deploy
 
             updateServerNames();
 
+            webWebapps = webServer.getWebappsPath();
+            serviceWebapps = appServer.getWebappsPath();
+
             isTrigger = true;
 
             btnConnect.Focus();
@@ -83,19 +86,22 @@ namespace QC_Deploy
 
         private string[,] readComboCfg(string cfgName)
         {
+            //Env Name, App IP, App UN, App PW, Web IP, Web UN, Web PW, Rel Path, App Path, Web Path, App Logs Path, Web Logs Path
+
+            int parmCount = 12;
             string[] lineOfContents = File.ReadAllLines(cfgName);
-            string[,] cfgConnections = new string[lineOfContents.Length, 7];
+            string[,] cfgConnections = new string[lineOfContents.Length, parmCount];
             int i = 0;
             foreach (var line in lineOfContents)
             {
                 string[] parVals = line.Split(',');
-                cfgConnections[i, 0] = parVals[0]; //Env Name
-                cfgConnections[i, 1] = parVals[1]; //App IP
-                cfgConnections[i, 2] = parVals[2]; //App UN
-                cfgConnections[i, 3] = parVals[3]; //App PW
-                cfgConnections[i, 4] = parVals[4]; //Web IP
-                cfgConnections[i, 5] = parVals[5]; //Web UN
-                cfgConnections[i, 6] = parVals[6]; //Web PW
+                
+
+                for(int j = 0; j < parmCount; j++)
+                {
+                    cfgConnections[i, j] = parVals[j].Trim();
+                }
+
                 i++;
             }
 
@@ -355,7 +361,7 @@ namespace QC_Deploy
                 setqStatus("CLEANED");
                 setBtnCleanLogs();
             }
-            string catCommand = cleanLogs();
+            string catCommand = cleanWebAppsLogs();
             executeCommand(catCommand, "W");
 
             if (isBackup)
@@ -381,7 +387,7 @@ namespace QC_Deploy
                 setqStatus("CLEANED");
                 setBtnCleanLogs();
             }
-            string catCommand = cleanLogs();
+            string catCommand = cleanServicesLogs();
             executeCommand(catCommand, "A");
 
             if (isBackup)

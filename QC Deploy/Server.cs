@@ -1,6 +1,7 @@
 ﻿using Renci.SshNet;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace QC_Deploy
@@ -11,6 +12,9 @@ namespace QC_Deploy
         string UN;
         string PW;
         string TYP;
+        string releasePATH;
+        string webappsPATH;
+        string logsPATH;
 
         Boolean isRequired = false;
         Boolean isWebappRequired = false;
@@ -22,19 +26,7 @@ namespace QC_Deploy
 
         public Server(string[,] connections, int srvID, string srvType)
         {
-            TYP = srvType;
-            if (srvType == "A")
-            {
-                IP = connections[srvID, 1].Trim();
-                UN = connections[srvID, 2].Trim();
-                PW = connections[srvID, 3].Trim();
-            }
-            else
-            {
-                IP = connections[srvID, 4].Trim();
-                UN = connections[srvID, 5].Trim();
-                PW = connections[srvID, 6].Trim();
-            }
+            setServer(connections, srvID, srvType);
         }
 
         public void setServer(string[,] connections, int srvID, string srvType)
@@ -45,13 +37,18 @@ namespace QC_Deploy
                 IP = connections[srvID, 1].Trim();
                 UN = connections[srvID, 2].Trim();
                 PW = connections[srvID, 3].Trim();
+                webappsPATH = connections[srvID, 8].Trim();
+                logsPATH = connections[srvID, 10].Trim();
             }
             else
             {
                 IP = connections[srvID, 4].Trim();
                 UN = connections[srvID, 5].Trim();
                 PW = connections[srvID, 6].Trim();
+                webappsPATH = connections[srvID, 9].Trim();
+                logsPATH = connections[srvID, 11].Trim();
             }
+            releasePATH = connections[srvID, 7].Trim();
         }
 
         public string connectServer()
@@ -164,6 +161,11 @@ namespace QC_Deploy
         public string getIP()
         {
             return IP;
+        }
+
+        public string getWebappsPath()
+        {
+            return webappsPATH;
         }
     }
 }

@@ -6,8 +6,8 @@
     <RootNamespace>QC_Deploy</RootNamespace>
     <UseWindowsForms>true</UseWindowsForms>
     <ApplicationIcon>tools_icon.ico</ApplicationIcon>
-    <AssemblyVersion>1.0.3</AssemblyVersion>
-    <FileVersion>1.0.3</FileVersion>
+    <AssemblyVersion>1.0.4</AssemblyVersion>
+    <FileVersion>1.0.4</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
