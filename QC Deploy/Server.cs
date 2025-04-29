@@ -13,6 +13,7 @@ namespace QC_Deploy
         string PW;
         string TYP;
         string releasePATH;
+        string backupPATH;
         string webappsPATH;
         string logsPATH;
 
@@ -39,6 +40,7 @@ namespace QC_Deploy
                 PW = connections[srvID, 3].Trim();
                 webappsPATH = connections[srvID, 8].Trim();
                 logsPATH = connections[srvID, 10].Trim();
+                backupPATH = connections[srvID, 12].Trim();
             }
             else
             {
@@ -47,6 +49,7 @@ namespace QC_Deploy
                 PW = connections[srvID, 6].Trim();
                 webappsPATH = connections[srvID, 9].Trim();
                 logsPATH = connections[srvID, 11].Trim();
+                backupPATH = connections[srvID, 13].Trim();
             }
             releasePATH = connections[srvID, 7].Trim();
         }
@@ -166,6 +169,16 @@ namespace QC_Deploy
         public string getWebappsPath()
         {
             return webappsPATH;
+        }
+
+        public string getLogsPath()
+        {
+            return logsPATH;
+        }
+
+        public string getBackupPath()
+        {
+            return backupPATH;
         }
     }
 }

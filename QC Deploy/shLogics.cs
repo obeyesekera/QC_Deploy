@@ -52,6 +52,10 @@ namespace QC_Deploy
 
             webWebapps = webServer.getWebappsPath();
             serviceWebapps = appServer.getWebappsPath();
+            webLogs = webServer.getLogsPath();
+            serviceLogs = appServer.getLogsPath();
+            webBackup = webServer.getBackupPath();
+            serviceBackup = appServer.getBackupPath();
 
             isTrigger = true;
 
@@ -86,9 +90,9 @@ namespace QC_Deploy
 
         private string[,] readComboCfg(string cfgName)
         {
-            //Env Name, App IP, App UN, App PW, Web IP, Web UN, Web PW, Rel Path, App Path, Web Path, App Logs Path, Web Logs Path
+            //Env Name, App IP, App UN, App PW, Web IP, Web UN, Web PW, Rel Path, App Path, Web Path, App Logs Path, Web Logs Path, App BK Path, Web BK Path
 
-            int parmCount = 12;
+            int parmCount = 14;
             string[] lineOfContents = File.ReadAllLines(cfgName);
             string[,] cfgConnections = new string[lineOfContents.Length, parmCount];
             int i = 0;

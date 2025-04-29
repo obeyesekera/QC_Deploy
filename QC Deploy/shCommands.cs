@@ -6,16 +6,20 @@
         string serviceWebapps;
         string webLogs;
         string serviceLogs;
+        string webBackup;
+        string serviceBackup;
 
         private string backupWebAppsMV(string webModule)
         {
-            string mvCommand = "mv " + webWebapps + webModule + " " + webWebapps + "bk_" + webModule;
+            //string mvCommand = "mv " + webWebapps + webModule + " " + webWebapps + "bk_" + webModule;
+            string mvCommand = "mv " + webWebapps + webModule + " " + webBackup + webModule;
             return mvCommand;
         }
 
         private string backupServicesMV(string appService)
         {
-            string mvCommand = "mv " + serviceWebapps + appService + ".war " + serviceWebapps + "bk/" + appService + ".war";
+            //string mvCommand = "mv " + serviceWebapps + appService + ".war " + serviceWebapps + "bk/" + appService + ".war";
+            string mvCommand = "mv " + serviceWebapps + appService + ".war " + serviceBackup + appService + ".war";
             return mvCommand;
         }
 
@@ -51,25 +55,27 @@
 
         private string touchWebAppsMV(string webModule)
         {
-            string mvCommand = "mv " + webWebapps + "bk_" + webModule + " " + webWebapps + webModule;
+            //string mvCommand = "mv " + webWebapps + "bk_" + webModule + " " + webWebapps + webModule;
+            string mvCommand = "mv " + webBackup + webModule + " " + webWebapps + webModule;
             return mvCommand;
         }
 
         private string touchServicesMV(string appService)
         {
-            string mvCommand = "mv " + serviceWebapps + "bk/" + appService + ".war " + serviceWebapps + appService + ".war";
+            //string mvCommand = "mv " + serviceWebapps + "bk/" + appService + ".war " + serviceWebapps + appService + ".war";
+            string mvCommand = "mv " + serviceBackup + appService + ".war " + serviceWebapps + appService + ".war";
             return mvCommand;
         }
 
         private string cleanWebAppsRM(string webModule)
         {
-            string rmCommand = "rm -rf " + webWebapps + "bk_" + webModule;
+            string rmCommand = "rm -rf " + webBackup + webModule;
             return rmCommand;
         }
 
         private string cleanServicesRM(string appService)
         {
-            string rmCommand = "rm " + serviceWebapps + "bk/" + appService + ".war";
+            string rmCommand = "rm " + serviceBackup + appService + ".war";
             return rmCommand;
         }
 
